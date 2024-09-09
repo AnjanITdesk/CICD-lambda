@@ -3,11 +3,12 @@ name: Deploy to AWS Lambda
 on:
   push:
     branches:
-      - main
+      - main  # or the branch you want to deploy from
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production  # Reference to the environment with required approvals
 
     steps:
       - name: Checkout code
@@ -16,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '18'  # Specify the Node.js version
 
       - name: Install dependencies
         run: npm install
@@ -29,24 +30,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y awscli
 
-      - name: Deploy to AWS Lambda (Staging)
-        if: github.ref == 'refs/heads/main'
+      - name: Deploy to AWS Lambda
         run: |
           aws lambda update-function-code \
-            --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_NAME_STAGING }} \
+            --function-name test1 \
             --zip-file fileb://function.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION_STAGING }}
-
-      - name: Deploy to AWS Lambda (Production)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          aws lambda update-function-code \
-            --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_NAME_PRODUCTION }} \
-            --zip-file fileb://function.zip
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION_PRODUCTION }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
