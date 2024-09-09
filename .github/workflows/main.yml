@@ -3,13 +3,12 @@ name: Deploy to AWS Lambda
 on:
   push:
     branches:
-      - main  # or the branch you want to deploy from
+      - main
+      - staging
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production  # Reference to the environment with required approvals
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -17,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # Specify the Node.js version
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
@@ -32,10 +31,11 @@ jobs:
 
       - name: Deploy to AWS Lambda
         run: |
+          FUNCTION_NAME=$(if [ "${{ github.ref }}" == "refs/heads/main" ]; then echo "prod-lambda-function"; else echo "staging-lambda-function"; fi)
           aws lambda update-function-code \
-            --function-name test1 \
+            --function-name $FUNCTION_NAME \
             --zip-file fileb://function.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ap-south-1  # Specify your AWS region
+          AWS_REGION: ap-south-1
