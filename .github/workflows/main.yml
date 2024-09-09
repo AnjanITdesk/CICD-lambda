@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - staging
+      - staging  # Include staging branch if using staging environment
 
 jobs:
   deploy:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '18'  # Specify the Node.js version
 
       - name: Install dependencies
         run: npm install
@@ -39,3 +39,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-south-1
+
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
