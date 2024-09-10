@@ -1,6 +1,9 @@
 name: Deploy to AWS Lambda
 
 on:
+  push:
+    branches:
+      - main  # Trigger on push to the release branch
   workflow_dispatch:
     inputs:
       environment:
