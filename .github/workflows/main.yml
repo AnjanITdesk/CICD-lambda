@@ -1,9 +1,16 @@
 name: Deploy to AWS Lambda
 
 on:
-  push:
-    branches:
-      - 'release/*'  # This specifies that the workflow will trigger on any branch that starts with 'release/'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the deployment environment'
+        required: true
+        default: 'stage'
+        type: choice
+        options:
+          - prod
+          - stage
 
 jobs:
   deploy:
@@ -30,12 +37,12 @@ jobs:
 
       - name: Deploy to AWS Lambda
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/release/prod" ]; then
+          if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
             aws lambda update-function-code \
               --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_PROD }} \
               --zip-file fileb://function.zip \
               --region ${{ secrets.AWS_REGION }}
-          elif [ "${{ github.ref }}" = "refs/heads/release/stage" ]; then
+          elif [ "${{ github.event.inputs.environment }}" = "stage" ]; then
             aws lambda update-function-code \
               --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_STAGE }} \
               --zip-file fileb://function.zip \
