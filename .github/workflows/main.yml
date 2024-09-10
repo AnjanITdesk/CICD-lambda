@@ -11,7 +11,12 @@ on:
         options:
           - prod
           - stage
-
+      release_branch:
+        description: 'Specify the release branch'
+        required: true
+        default: 'main'
+        type: string
+        
 jobs:
   deploy:
     runs-on: ubuntu-latest
