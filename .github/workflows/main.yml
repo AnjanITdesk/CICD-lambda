@@ -35,7 +35,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y awscli
 
-      - name: Deploy to AWS Lambda
+      - name: Check branch and deploy to AWS Lambda
+        if: ${{ github.ref == 'refs/heads/release' }}
         run: |
           if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
             aws lambda update-function-code \
