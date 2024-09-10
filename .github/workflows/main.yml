@@ -1,15 +1,20 @@
 name: Deploy to AWS Lambda
 
 on:
-  push:
-    branches:
-      - main  # or the branch you want to deploy from
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the deployment environment'
+        required: true
+        default: 'stage'
+        type: choice
+        options:
+          - prod
+          - stage
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production  # Reference to the environment with required approvals
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -32,10 +37,17 @@ jobs:
 
       - name: Deploy to AWS Lambda
         run: |
-          aws lambda update-function-code \
-            --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_PROD }} \
-            --zip-file fileb://function.zip \
-            --region ${{ secrets.AWS_REGION }}
+          if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+            aws lambda update-function-code \
+              --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_PROD }} \
+              --zip-file fileb://function.zip \
+              --region ${{ secrets.AWS_REGION }}
+          elif [ "${{ github.event.inputs.environment }}" = "stage" ]; then
+            aws lambda update-function-code \
+              --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_STAGE }} \
+              --zip-file fileb://function.zip \
+              --region ${{ secrets.AWS_REGION }}
+          fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
