@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production  # Reference to the environment with required approvals
+    environment: stage  # Reference to the environment with required approvals
 
     steps:
       - name: Checkout code
