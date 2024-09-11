@@ -3,7 +3,7 @@ name: Deploy to AWS Lambda
 on:
   push:
     branches:
-      - stage-v2.0  # or the branch you want to deploy from
+      - stage-v1.0  # or the branch you want to deploy from
 
 jobs:
   deploy:
